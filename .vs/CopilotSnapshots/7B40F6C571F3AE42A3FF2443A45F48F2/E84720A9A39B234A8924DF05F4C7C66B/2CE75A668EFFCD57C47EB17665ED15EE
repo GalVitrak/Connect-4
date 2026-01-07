@@ -1,0 +1,19 @@
+﻿#ifndef CONNECT4_MENU_H
+#define CONNECT4_MENU_H
+
+/* Print the menu prompt */
+void print_menu(void);
+
+/* Enter the interactive menu loop (blocks until user exits) */
+void menu_loop(void);
+
+/* Clear the console screen */
+void clear_console(void);
+
+/* Get console width */
+int get_console_width(void);
+
+/* Print centered text */
+void print_centered(const char* text);
+
+#endif /* CONNECT4_MENU_H */

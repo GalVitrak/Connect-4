@@ -1,0 +1,20 @@
+﻿#include "board.h"
+#include "graphics.h"
+
+int main(void) {
+	board_init();
+
+	if (!graphics_init(700, 600, "Connect-4")) {
+		/* fall back to console print if graphics init fails */
+		board_print();
+		return 1;
+	}
+
+	while (!graphics_should_close()) {
+		graphics_render_board();
+		graphics_poll_events();
+	}
+
+	graphics_shutdown();
+	return 0;
+}

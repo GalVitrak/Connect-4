@@ -1,0 +1,7 @@
+﻿#include "board.h"
+
+int main(void) {
+	board_init();
+	board_print();
+	return 0;
+}

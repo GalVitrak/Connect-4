@@ -1,0 +1,98 @@
+﻿#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#define ROWS 6
+#define COLS 7
+
+// enumeration for the state of each cell in the board
+typedef enum {
+	cell_empty = 0,
+	cell_player1,
+	cell_player2
+} Cell;
+
+// the game board, a 2D array of Cells
+static Cell board[ROWS][COLS];
+	
+// initialize the board to be empty
+void board_init(void) {
+	for (int r = 0; r < ROWS; r++) {
+		for (int c = 0; c < COLS; c++) {
+			board[r][c] = cell_empty;
+		}
+	}
+}
+
+#ifdef _WIN32
+static void enable_ansi_colors_once(void)
+{
+	static int tried = 0;
+	if (tried) return;
+	tried = 1;
+
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE) return;
+
+	DWORD mode = 0;
+	if (!GetConsoleMode(hOut, &mode)) return;
+
+	// Enable virtual terminal processing so ANSI escape codes work on Windows consoles
+	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOut, mode);
+}
+#else
+static void enable_ansi_colors_once(void) { /* no-op on POSIX */ }
+#endif
+
+// Print the board using ASCII borders but colored cell interiors using ANSI background colors.
+// Each cell is drawn as a 5-char wide colored block so the board looks richer in a terminal.
+void board_print(void) {
+	enable_ansi_colors_once();
+
+	const char *bg_red = "\x1b[41m";    /* red background */
+	const char *bg_yellow = "\x1b[43m"; /* yellow background */
+	const char *bg_gray = "\x1b[100m";  /* dark gray background for empty */
+	const char *fg_white = "\x1b[97m";  /* white foreground for contrast */
+	const char *fg_black = "\x1b[30m";  /* black foreground for contrast */
+	const char *reset = "\x1b[0m";
+
+	// Column headers (centered over 5-char cells)
+	printf("    ");
+	for (int c = 1; c <= COLS; ++c) {
+		printf("  %d  ", c);
+	}
+	printf("\n");
+
+	// Top border
+	printf("   +");
+	for (int c = 0; c < COLS; ++c) printf("-----+");
+	printf("\n");
+
+	for (int r = 0; r < ROWS; ++r) {
+		// Cell row (one visual row per logical row)
+		printf("%2d |", r + 1);
+		for (int c = 0; c < COLS; ++c) {
+			Cell v = board[r][c];
+			if (v == cell_player1) {
+				// red background with white X
+				printf("%s%s  X  %s|", bg_red, fg_white, reset);
+			} else if (v == cell_player2) {
+				// yellow background with black O
+				printf("%s%s  O  %s|", bg_yellow, fg_black, reset);
+			} else {
+				// empty slot: gray block
+				printf("%s     %s|", bg_gray, reset);
+			}
+		}
+		printf("\n");
+
+		// Separator
+		printf("   +");
+		for (int c = 0; c < COLS; ++c) printf("-----+");
+		printf("\n");
+	}
+}

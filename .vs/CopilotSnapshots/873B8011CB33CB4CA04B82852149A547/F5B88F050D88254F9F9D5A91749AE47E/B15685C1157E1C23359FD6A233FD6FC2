@@ -1,0 +1,135 @@
+﻿#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#define ROWS 6
+#define COLS 7
+
+// enumeration for the state of each cell in the board
+typedef enum {
+	cell_empty = 0,
+	cell_player1,
+	cell_player2
+} Cell;
+
+// the game board, a 2D array of Cells
+static Cell board[ROWS][COLS];
+	
+// initialize the board to be empty
+void board_init(void) {
+	for (int r = 0; r < ROWS; r++) {
+		for (int c = 0; c < COLS; c++) {
+			board[r][c] = cell_empty;
+		}
+	}
+}
+
+#ifdef _WIN32
+static void enable_ansi_colors_once(void)
+{
+	static int tried = 0;
+	if (tried) return;
+	tried = 1;
+
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE) return;
+
+	DWORD mode = 0;
+	if (!GetConsoleMode(hOut, &mode)) return;
+
+	// Enable virtual terminal processing so ANSI escape codes work on Windows consoles
+	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOut, mode);
+}
+#else
+static void enable_ansi_colors_once(void) { /* no-op on POSIX */ }
+#endif
+
+// Print the board using colored cell interiors and nicer borders when Unicode is available.
+void board_print(void) {
+	enable_ansi_colors_once();
+
+	/* ANSI colors */
+	const char *bg_red = "\x1b[41m";    /* red background */
+	const char *bg_yellow = "\x1b[43m"; /* yellow background */
+	const char *bg_gray = "\x1b[100m";  /* dark gray background for empty */
+	const char *fg_white = "\x1b[97m";  /* white foreground for contrast */
+	const char *fg_black = "\x1b[30m";  /* black foreground for contrast */
+	const char *reset = "\x1b[0m";
+
+	/* detect if we can use Unicode box-drawing characters */
+	int uni = 1;
+#ifdef _WIN32
+	/* try to set UTF-8 code page; if it fails we'll fall back to ASCII borders */
+	UINT prevCP = GetConsoleOutputCP();
+	if (!SetConsoleOutputCP(CP_UTF8)) {
+		uni = 0;
+	} else {
+		/* leave UTF-8 active */
+	}
+#endif
+
+	const char *tl = uni ? "┌" : "+";
+	const char *tm = uni ? "┬" : "+";
+	const char *tr = uni ? "┐" : "+";
+	const char *ml = uni ? "├" : "+";
+	const char *mm = uni ? "┼" : "+";
+	const char *mr = uni ? "┤" : "+";
+	const char *bl = uni ? "└" : "+";
+	const char *bm = uni ? "┴" : "+";
+	const char *br = uni ? "┘" : "+";
+	const char *hseg = uni ? "─────" : "-----"; /* width matches 5-char cells */
+	const char *vbar = uni ? "│" : "|";
+
+	// Column headers (centered over 5-char cells)
+	printf("    ");
+	for (int c = 1; c <= COLS; ++c) {
+		printf("  %d   ", c);
+	}
+	printf("\n");
+
+	// Top border
+	printf("   %s", tl);
+	for (int c = 0; c < COLS; ++c) {
+		printf("%s", hseg);
+		if (c == COLS - 1) printf("%s", tr);
+		else printf("%s", tm);
+	}
+	printf("\n");
+
+	for (int r = 0; r < ROWS; ++r) {
+		// Cell row (one visual row per logical row)
+		printf("%2d %s", r + 1, vbar);
+		for (int c = 0; c < COLS; ++c) {
+			Cell v = board[r][c];
+			if (v == cell_player1) {
+				// red background with white X
+				printf("%s%s  X  %s%s", bg_red, fg_white, reset, vbar);
+			} else if (v == cell_player2) {
+				// yellow background with black O
+				printf("%s%s  O  %s%s", bg_yellow, fg_black, reset, vbar);
+			} else {
+				// empty slot: gray block
+				printf("%s     %s%s", bg_gray, reset, vbar);
+			}
+		}
+		printf("\n");
+
+		// Separator
+		printf("   %s", ml);
+		for (int c = 0; c < COLS; ++c) {
+			printf("%s", hseg);
+			if (c == COLS - 1) printf("%s", mr);
+			else printf("%s", mm);
+		}
+		printf("\n");
+	}
+
+#ifdef _WIN32
+	/* optional: restore previous code page to avoid side effects */
+	SetConsoleOutputCP(prevCP);
+#endif
+}

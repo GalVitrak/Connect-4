@@ -1,0 +1,495 @@
+﻿/**
+ * Connect-4 Game - AI Module
+ * Implements multiple AI difficulty levels
+ */
+
+#include "ai.h"
+#include "board.h"
+#include "input.h"
+#include "game.h"
+#include <stdlib.h>
+#include <time.h>
+#include <limits.h>
+
+/**
+ * Find a winning move for the specified player
+ * Simulates each possible move and checks if it wins
+ * Returns: Move with row/col, or {-1,-1} if no winning move
+ */
+GameMove find_winning_move(Cell player) {
+	// Try each column
+	for (int col = 0; col < COLS; col++) {
+		// Find the lowest empty row in this column
+		for (int row = ROWS - 1; row >= 0; row--) {
+			if (board[row][col] == cell_empty) {
+				// Simulate placing the piece
+				board[row][col] = player;
+				GameMove test_move = { row, col };
+
+				// Check if this move wins
+				if (check_winner(test_move, player) == 1) {
+					// Undo the simulated move
+					board[row][col] = cell_empty;
+					// Return this winning move
+					return test_move;
+				}
+
+				// Undo the simulated move
+				board[row][col] = cell_empty;
+				break; // Only check the lowest empty position in this column
+			}
+		}
+	}
+
+	// No winning move found - return invalid move
+	GameMove no_move = { -1, -1 };
+	return no_move;
+}
+
+/**
+ * Count threats (2 or 3 in a row) for a given move
+ * Used by medium AI for strategic positioning
+ */
+int count_threats(int row, int col, Cell player) {
+	int threats = 0;
+	
+	// Simulate the move
+	board[row][col] = player;
+	GameMove test_move = {row, col};
+	
+	// Check all directions for potential connects
+	// Horizontal
+	int count = 1;
+	int temp_col = col;
+	while (temp_col + 1 < COLS && board[row][temp_col + 1] == player) {
+		count++;
+		temp_col++;
+	}
+	temp_col = col;
+	while (temp_col - 1 >= 0 && board[row][temp_col - 1] == player) {
+		count++;
+		temp_col--;
+	}
+	if (count >= 2) threats += count;
+	
+	// Vertical
+	count = 1;
+	int temp_row = row;
+	while (temp_row + 1 < ROWS && board[temp_row + 1][col] == player) {
+		count++;
+		temp_row++;
+	}
+	temp_row = row;
+	while (temp_row - 1 >= 0 && board[temp_row - 1][col] == player) {
+		count++;
+		temp_row--;
+	}
+	if (count >= 2) threats += count;
+	
+	// Undo the move
+	board[row][col] = cell_empty;
+	
+	return threats;
+}
+
+/**
+ * Find the best strategic move based on threat analysis
+ * Considers connecting pieces and center control
+ */
+GameMove find_best_strategic_move(Cell player) {
+	int best_score = -1;
+	GameMove best_move = {-1, -1};
+	
+	// Evaluate each column
+	for (int col = 0; col < COLS; col++) {
+		for (int row = ROWS - 1; row >= 0; row--) {
+			if (board[row][col] == cell_empty) {
+				int score = count_threats(row, col, player);
+				
+				// Bonus for center columns
+				if (col == 3) score += 3;
+				else if (col == 2 || col == 4) score += 2;
+				else if (col == 1 || col == 5) score += 1;
+				
+				if (score > best_score) {
+					best_score = score;
+					best_move.row = row;
+					best_move.column = col;
+				}
+				break; // Only check lowest position
+			}
+		}
+	}
+	
+	return best_move;
+}
+
+/**
+ * AI Easy difficulty - plays random valid moves
+ */
+GameMove ai_easy_move(void) {
+	int column = rand() % 7;
+	//check if column is full
+	int i;
+	int full = 1;
+	int row;
+	for (i = 5; i >= 0; i--) {
+		if (board[i][column] == cell_empty) {
+			full = 0;
+			row = i;
+			break;
+		}
+	}
+	if (full) {
+		return ai_easy_move();
+	}
+	else {
+		GameMove move = { row, column };
+		return move;
+	}
+}
+
+/**
+ * AI Medium difficulty
+ * Wins when possible, blocks threats, makes strategic moves
+ */
+GameMove ai_medium_move(void) {
+	// Initialize random seed once
+	static int seeded = 0;
+	if (!seeded) {
+		srand((unsigned int)time(NULL));
+		seeded = 1;
+	}
+	
+	// 1. Check if AI can win
+	GameMove winning_move = find_winning_move(cell_player2);
+	if (winning_move.row != -1) {
+		return winning_move;
+	}
+
+	// 2. Block player from winning
+	GameMove blocking_move = find_winning_move(cell_player1);
+	if (blocking_move.row != -1) {
+		return blocking_move;
+	}
+
+	// 3. Find best strategic move (builds threats and prefers center)
+	GameMove strategic_move = find_best_strategic_move(cell_player2);
+	if (strategic_move.row != -1) {
+		// Add 30% randomness - sometimes don't take the best move
+		if (rand() % 100 < 70) {
+			return strategic_move;
+		}
+	}
+
+	// 4. Random center-biased move (30% of the time or if no good move found)
+	int center_preference[] = {3, 2, 4, 1, 5, 0, 6};
+	
+	// Shuffle the center preference array for variety
+	for (int i = 0; i < 7; i++) {
+		int j = rand() % 7;
+		int temp = center_preference[i];
+		center_preference[i] = center_preference[j];
+		center_preference[j] = temp;
+	}
+	
+	for (int i = 0; i < 7; i++) {
+		int col = center_preference[i];
+		for (int row = ROWS - 1; row >= 0; row--) {
+			if (board[row][col] == cell_empty) {
+				GameMove move = { row, col };
+				return move;
+			}
+		}
+	}
+
+	// 5. Fallback to random (shouldn't happen unless board is full)
+	return ai_easy_move();
+}
+
+// ==================== HARD AI - MINIMAX ALGORITHM ====================
+
+/**
+ * Evaluate the board position for a given player
+ * Returns positive score for favorable positions, negative for unfavorable
+ */
+int evaluate_position(Cell player) {
+	int score = 0;
+	Cell opponent = (player == cell_player1) ? cell_player2 : cell_player1;
+	
+	// Check all possible 4-in-a-row windows
+	// Horizontal
+	for (int r = 0; r < ROWS; r++) {
+		for (int c = 0; c <= COLS - 4; c++) {
+			int player_count = 0;
+			int opponent_count = 0;
+			int empty_count = 0;
+			
+			for (int i = 0; i < 4; i++) {
+				if (board[r][c + i] == player) player_count++;
+				else if (board[r][c + i] == opponent) opponent_count++;
+				else empty_count++;
+			}
+			
+			// Score this window
+			if (player_count == 4) score += 100;
+			else if (player_count == 3 && empty_count == 1) score += 5;
+			else if (player_count == 2 && empty_count == 2) score += 2;
+			
+			if (opponent_count == 4) score -= 100;
+			else if (opponent_count == 3 && empty_count == 1) score -= 4;
+		}
+	}
+	
+	// Vertical
+	for (int c = 0; c < COLS; c++) {
+		for (int r = 0; r <= ROWS - 4; r++) {
+			int player_count = 0;
+			int opponent_count = 0;
+			int empty_count = 0;
+			
+			for (int i = 0; i < 4; i++) {
+				if (board[r + i][c] == player) player_count++;
+				else if (board[r + i][c] == opponent) opponent_count++;
+				else empty_count++;
+			}
+			
+			if (player_count == 4) score += 100;
+			else if (player_count == 3 && empty_count == 1) score += 5;
+			else if (player_count == 2 && empty_count == 2) score += 2;
+			
+			if (opponent_count == 4) score -= 100;
+			else if (opponent_count == 3 && empty_count == 1) score -= 4;
+		}
+	}
+	
+	// Diagonal (positive slope)
+	for (int r = 0; r <= ROWS - 4; r++) {
+		for (int c = 0; c <= COLS - 4; c++) {
+			int player_count = 0;
+			int opponent_count = 0;
+			int empty_count = 0;
+			
+			for (int i = 0; i < 4; i++) {
+				if (board[r + i][c + i] == player) player_count++;
+				else if (board[r + i][c + i] == opponent) opponent_count++;
+				else empty_count++;
+			}
+			
+			if (player_count == 4) score += 100;
+			else if (player_count == 3 && empty_count == 1) score += 5;
+			else if (player_count == 2 && empty_count == 2) score += 2;
+			
+			if (opponent_count == 4) score -= 100;
+			else if (opponent_count == 3 && empty_count == 1) score -= 4;
+		}
+	}
+	
+	// Diagonal (negative slope)
+	for (int r = 3; r < ROWS; r++) {
+		for (int c = 0; c <= COLS - 4; c++) {
+			int player_count = 0;
+			int opponent_count = 0;
+			int empty_count = 0;
+			
+			for (int i = 0; i < 4; i++) {
+				if (board[r - i][c + i] == player) player_count++;
+				else if (board[r - i][c + i] == opponent) opponent_count++;
+				else empty_count++;
+			}
+			
+			if (player_count == 4) score += 100;
+			else if (player_count == 3 && empty_count == 1) score += 5;
+			else if (player_count == 2 && empty_count == 2) score += 2;
+			
+			if (opponent_count == 4) score -= 100;
+			else if (opponent_count == 3 && empty_count == 1) score -= 4;
+		}
+	}
+	
+	// Bonus for center column control
+	for (int r = 0; r < ROWS; r++) {
+		if (board[r][3] == player) score += 3;
+	}
+	
+	return score;
+}
+
+/**
+ * Check if the game is over (win or draw)
+ */
+int is_game_over(void) {
+	// Check for win (simplified - checks if any 4 in a row exists)
+	for (int r = 0; r < ROWS; r++) {
+		for (int c = 0; c < COLS; c++) {
+			if (board[r][c] != cell_empty) {
+				GameMove test = {r, c};
+				if (check_winner(test, board[r][c])) {
+					return 1;
+				}
+			}
+		}
+	}
+	
+	// Check for draw (board full)
+	int full = 1;
+	for (int c = 0; c < COLS; c++) {
+		if (board[0][c] == cell_empty) {
+			full = 0;
+			break;
+		}
+	}
+	
+	return full;
+}
+
+/**
+ * Get all valid moves (columns that aren't full)
+ */
+void get_valid_moves(int* valid_cols, int* count) {
+	*count = 0;
+	for (int c = 0; c < COLS; c++) {
+		if (board[0][c] == cell_empty) {
+			valid_cols[*count] = c;
+			(*count)++;
+		}
+	}
+}
+
+/**
+ * Make a move on the board
+ * Returns the row where the piece landed
+ */
+int make_move(int col, Cell player) {
+	for (int r = ROWS - 1; r >= 0; r--) {
+		if (board[r][col] == cell_empty) {
+			board[r][col] = player;
+			return r;
+		}
+	}
+	return -1;
+}
+
+/**
+ * Undo a move on the board
+ */
+void undo_move(int row, int col) {
+	board[row][col] = cell_empty;
+}
+
+/**
+ * Minimax algorithm with alpha-beta pruning
+ * depth: remaining search depth
+ * alpha: best value maximizer can guarantee
+ * beta: best value minimizer can guarantee
+ * maximizing: true if maximizing player's turn
+ * player: the AI player
+ */
+int minimax(int depth, int alpha, int beta, int maximizing, Cell player) {
+	Cell opponent = (player == cell_player1) ? cell_player2 : cell_player1;
+	
+	// Terminal conditions
+	if (depth == 0 || is_game_over()) {
+		return evaluate_position(player);
+	}
+	
+	int valid_cols[COLS];
+	int move_count;
+	get_valid_moves(valid_cols, &move_count);
+	
+	if (move_count == 0) {
+		return 0; // Draw
+	}
+	
+	if (maximizing) {
+		int max_eval = INT_MIN;
+		for (int i = 0; i < move_count; i++) {
+			int col = valid_cols[i];
+			int row = make_move(col, player);
+			
+			int eval = minimax(depth - 1, alpha, beta, 0, player);
+			
+			undo_move(row, col);
+			
+			max_eval = (eval > max_eval) ? eval : max_eval;
+			alpha = (alpha > eval) ? alpha : eval;
+			
+			if (beta <= alpha) {
+				break; // Beta cutoff
+			}
+		}
+		return max_eval;
+	} else {
+		int min_eval = INT_MAX;
+		for (int i = 0; i < move_count; i++) {
+			int col = valid_cols[i];
+			int row = make_move(col, opponent);
+			
+			int eval = minimax(depth - 1, alpha, beta, 1, player);
+			
+			undo_move(row, col);
+			
+			min_eval = (eval < min_eval) ? eval : min_eval;
+			beta = (beta < eval) ? beta : eval;
+			
+			if (beta <= alpha) {
+				break; // Alpha cutoff
+			}
+		}
+		return min_eval;
+	}
+}
+
+/**
+ * AI Hard difficulty - uses Minimax algorithm
+ * Looks ahead 5 moves to find optimal play
+ */
+GameMove ai_hard_move(void) {
+	const int SEARCH_DEPTH = 5; // Look ahead 5 moves
+	
+	// 1. Always win if possible
+	GameMove winning_move = find_winning_move(cell_player2);
+	if (winning_move.row != -1) {
+		return winning_move;
+	}
+	
+	// 2. Always block opponent's winning move
+	GameMove blocking_move = find_winning_move(cell_player1);
+	if (blocking_move.row != -1) {
+		return blocking_move;
+	}
+	
+	// 3. Use minimax to find best move
+	int valid_cols[COLS];
+	int move_count;
+	get_valid_moves(valid_cols, &move_count);
+	
+	int best_score = INT_MIN;
+	int best_col = 3; // Default to center
+	
+	for (int i = 0; i < move_count; i++) {
+		int col = valid_cols[i];
+		int row = make_move(col, cell_player2);
+		
+		int score = minimax(SEARCH_DEPTH - 1, INT_MIN, INT_MAX, 0, cell_player2);
+		
+		undo_move(row, col);
+		
+		if (score > best_score) {
+			best_score = score;
+			best_col = col;
+		}
+	}
+	
+	// Make the best move
+	for (int r = ROWS - 1; r >= 0; r--) {
+		if (board[r][best_col] == cell_empty) {
+			GameMove move = {r, best_col};
+			return move;
+		}
+	}
+	
+	// Fallback (shouldn't reach here)
+	return ai_easy_move();
+}
+

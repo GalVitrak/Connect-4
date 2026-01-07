@@ -1,0 +1,18 @@
+﻿#ifndef CONNECT4_BOARD_H
+#define CONNECT4_BOARD_H
+
+#define ROWS 6
+#define COLS 7
+
+typedef enum {
+	cell_empty = 0,
+	cell_player1,
+	cell_player2
+} Cell;
+
+Cell board[ROWS][COLS];
+
+void board_init(void);
+void board_print(void);
+
+#endif /* CONNECT4_BOARD_H */

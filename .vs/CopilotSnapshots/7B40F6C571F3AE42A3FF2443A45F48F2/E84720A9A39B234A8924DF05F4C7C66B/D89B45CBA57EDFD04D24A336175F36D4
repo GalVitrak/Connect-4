@@ -1,0 +1,15 @@
+﻿#ifndef CONNECT4_INPUT_H
+#define CONNECT4_INPUT_H
+
+typedef struct {
+	int row;
+	int column;
+} GameMove;
+
+GameMove input_player_move(void);
+
+int press_enter_to_proceed();
+
+int input_player_int_range(int low, int high);
+
+#endif /* CONNECT4_INPUT_H */

@@ -1,0 +1,126 @@
+﻿/**
+ * Connect-4 Game - Statistics Module Implementation
+ * Tracks and displays game statistics and win/loss records
+ */
+
+#include "stats.h"
+#include "menu.h"
+#include <stdio.h>
+
+/* Global statistics - defined once here, declared extern in stats.h */
+int player_1_wins_vs_easy = 0;
+int player_1_wins_vs_medium = 0;
+int player_1_wins_vs_hard = 0;
+int player_1_wins_vs_player_2 = 0;
+int player_2_wins_vs_player_1 = 0;
+int pc_wins_easy = 0;
+int pc_wins_medium = 0;
+int pc_wins_hard = 0;
+int pvp_games = 0;
+int pve_games_easy = 0;
+int pve_games_medium = 0;
+int pve_games_hard = 0;
+
+/* Player vs Computer - Easy difficulty win tracking */
+void player_1_win_easy(void) {
+	player_1_wins_vs_easy++;
+}
+
+/* Player vs Computer - Medium difficulty win tracking */
+void player_1_win_medium(void) {
+	player_1_wins_vs_medium++;	
+}
+
+/* Player vs Computer - Hard difficulty win tracking */
+void player_1_win_hard(void) {
+	player_1_wins_vs_hard++;
+}
+
+/* Player vs Player - Player 1 win tracking */
+void player_1_win_pvp(void) {
+	player_1_wins_vs_player_2++;
+}
+
+/* Player vs Player - Player 2 win tracking */
+void player_2_win_pvp(void) {
+	player_2_wins_vs_player_1++;
+}
+
+/* Computer win tracking - Easy difficulty */
+void pc_win_easy(void) {
+	pc_wins_easy++;
+}
+
+/* Computer win tracking - Medium difficulty */
+void pc_win_medium(void) {
+	pc_wins_medium++;
+}
+
+/* Computer win tracking - Hard difficulty */
+void pc_win_hard(void) {
+	pc_wins_hard++;
+}
+
+/* Game count tracking functions */
+void count_game_pvp(void) {
+	pvp_games++;
+}
+
+void count_game_easy(void) {
+	pve_games_easy++;
+}
+
+void count_game_medium(void) {
+	pve_games_medium++;
+}
+
+void count_game_hard(void) {
+	pve_games_hard++;
+}
+
+/**
+ * Display all game statistics in formatted output
+ * Shows comprehensive stats for all game modes
+ */
+void print_stats(void) {
+	char buffer[100];
+	
+	print_centered("=== Game Statistics ===");
+	printf("\n");
+	
+	/* Player vs Computer Statistics */
+	print_centered("--- Player vs Computer ---");
+	
+	/* Easy difficulty stats */
+	snprintf(buffer, sizeof(buffer), "Easy   - Games: %d | Wins: %d | Losses: %d", 
+		pve_games_easy, player_1_wins_vs_easy, pc_wins_easy);
+	print_centered(buffer);
+	
+	/* Medium difficulty stats */
+	snprintf(buffer, sizeof(buffer), "Medium - Games: %d | Wins: %d | Losses: %d", 
+		pve_games_medium, player_1_wins_vs_medium, pc_wins_medium);
+	print_centered(buffer);
+	
+	/* Hard difficulty stats */
+	snprintf(buffer, sizeof(buffer), "Hard   - Games: %d | Wins: %d | Losses: %d", 
+		pve_games_hard, player_1_wins_vs_hard, pc_wins_hard);
+	print_centered(buffer);
+	
+	printf("\n");
+	
+	/* Player vs Player Statistics */
+	print_centered("--- Player vs Player ---");
+	
+	snprintf(buffer, sizeof(buffer), "Total Games: %d", pvp_games);
+	print_centered(buffer);
+	
+	snprintf(buffer, sizeof(buffer), "Player 1 Wins: %d", player_1_wins_vs_player_2);
+	print_centered(buffer);
+	
+	snprintf(buffer, sizeof(buffer), "Player 2 Wins: %d", player_2_wins_vs_player_1);
+	print_centered(buffer);
+	
+	printf("\n");
+	print_centered("=======================");
+	printf("\n");
+}
