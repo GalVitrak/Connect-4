@@ -75,10 +75,10 @@ static int get_console_width(void) {
 
 /**
  * Display the board with colors and formatting
- * Uses ANSI escape codes for colored pieces:
- * - Red (X) for Player 1
- * - Yellow (O) for Player 2
- * - Gray (.) for empty cells
+ * Uses ANSI escape codes for colored circles:
+ * - Red circle (O) for Player 1
+ * - Yellow circle (O) for Player 2
+ * - Dot (.) for empty cells
  */
 void board_print(void) {
     enable_ansi_colors_once();
@@ -86,7 +86,6 @@ void board_print(void) {
     /* ANSI color escape codes */
     const char* col_red = "\x1b[31m";
     const char* col_yellow = "\x1b[33m";
-    const char* col_gray = "\x1b[90m";
     const char* col_reset = "\x1b[0m";
 
     /* Calculate centering */
@@ -118,11 +117,14 @@ void board_print(void) {
         for (int c = 0; c < COLS; ++c) {
             Cell v = board[r][c];
             if (v == cell_player1) {
-                printf(" %sX%s |", col_red, col_reset);
+                /* Red circle */
+                printf(" %sO%s |", col_red, col_reset);
             } else if (v == cell_player2) {
+                /* Yellow circle */
                 printf(" %sO%s |", col_yellow, col_reset);
             } else {
-                printf(" %s.%s |", col_gray, col_reset);
+                /* Empty slot - simple dot */
+                printf(" . |");
             }
         }
         printf("\n");

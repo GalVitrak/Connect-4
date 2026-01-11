@@ -1,5 +1,9 @@
 ﻿# Connect-4 Game
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/GalVitrak/Connect-4)
+[![Language](https://img.shields.io/badge/Language-C-green.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![Grade](https://img.shields.io/badge/Grade-96%2F100-success)](README.md)
+
 A feature-rich implementation of the classic Connect-4 strategy game in C, with multiple AI difficulty levels and comprehensive statistics tracking.
 
 ## Features
@@ -12,7 +16,11 @@ A feature-rich implementation of the classic Connect-4 strategy game in C, with 
   - **Hard** - Advanced AI using Minimax algorithm with alpha-beta pruning
 
 ### User Interface
-- Colored ASCII board display (Red for Player 1, Yellow for Player 2/Computer)
+- Colored ASCII board display with disc symbols
+  - Filled circle (●) for placed pieces
+  - Hollow circle (○) for empty slots
+- Red discs for Player 1, Yellow discs for Player 2/Computer
+- AI move announcements ("AI placed a piece in Column X")
 - Centered text layout for professional appearance
 - Cross-platform support (Windows & Unix/Linux)
 - Clear numbered menu system
@@ -92,38 +100,39 @@ Follow the on-screen menu:
 1. Select game mode (PvP or vs Computer)
 2. If vs Computer, choose difficulty
 3. Enter column numbers (1-7) to place pieces
-4. View statistics from the main menu
+4. AI will announce its moves after each turn
+5. View statistics from the main menu
 
 ## Game Rules
 
 - Board: 6 rows × 7 columns
-- Players take turns dropping pieces into columns
-- Pieces fall to the lowest available position
-- First player to get 4 pieces in a row (vertical, horizontal, or diagonal) wins
+- Players take turns dropping colored discs into columns
+- Discs fall to the lowest available position (gravity)
+- First player to get 4 discs in a row (vertical, horizontal, or diagonal) wins
 - If the board fills up with no winner, the game is a draw
 
 ## Code Quality
 
 ### Standards Followed
-- ✅ Modular design with clear separation of concerns
-- ✅ Comprehensive function documentation
-- ✅ Header guards on all `.h` files
-- ✅ Input validation and error handling
-- ✅ English variable and function names
-- ✅ Proper code indentation
-- ✅ Magic numbers replaced with constants (`WIN_COUNT`, `BOARD_FULL`)
+- Modular design with clear separation of concerns
+- Comprehensive function documentation
+- Header guards on all `.h` files
+- Input validation and error handling
+- English variable and function names
+- Proper code indentation
+- Magic numbers replaced with constants (`WIN_COUNT`, `BOARD_FULL`)
 
 ### Requirements Met (מבוא למדעי המחשב)
-- ✅ אתחול לוח משחק  - `board_init()`
-- ✅ הצגת לוח - `board_print()` with colors
-- ✅ מהלך שחקן - Full validation and gravity simulation
-- ✅ בדיקת ניצחון - All directions checked
-- ✅ בדיקת תיקו - Board full detection
-- ✅ תפריט ראשי - Complete menu system
-- ✅ 3 רמות קושי - Easy, Medium, Hard
-- ✅ פירוק לפונקציות - Modular architecture
-- ✅ קריאות קוד - Clear naming and documentation
-- ✅ טיפול בקלט לא תקין - Comprehensive validation
+- לוח משחק אתחול - `board_init()`
+- הצגת לוח - `board_print()` with colors and disc symbols
+- מהלך שחקן - Full validation and gravity simulation
+- בדיקת ניצחון - All directions checked correctly
+- בדיקת תיקו - Board full detection
+- תפריט ראשי - Complete menu system
+- 3 רמות קושי - Easy, Medium, Hard
+- פירוק לפונקציות - Modular architecture
+- קריאות קוד - Clear naming and documentation
+- טיפול בקלט לא תקין - Comprehensive validation
 
 ## AI Usage Documentation
 
@@ -138,6 +147,7 @@ This project was developed with assistance from GitHub Copilot AI. The AI was pr
 - **Code Hints**:
   - Cross-platform console clearing (`system("cls")` vs `system("clear")`)
   - ANSI color codes for terminal output
+  - Unicode disc symbols (filled and hollow circles) for better visual representation
   - Windows console API for detecting terminal width
 
 - **Bug Fixes**:
@@ -145,6 +155,7 @@ This project was developed with assistance from GitHub Copilot AI. The AI was pr
   - Fixing `extern` keyword misuse in variable declarations
   - Resolving linker errors with board array definition
   - Input buffer clearing issues after `scanf()`
+  - Diagonal win detection logic (counting both directions correctly)
 
 - **Code Review**:
   - Identifying missing function documentation

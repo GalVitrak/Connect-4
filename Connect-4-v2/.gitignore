@@ -1,12 +1,28 @@
-# Visual Studio files and folders
+# Visual Studio / VS Code
+
+# VS solution folders and files
 .vs/
+.vscode/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 *.userprefs
 
-# Build results
+# VS Copilot Snapshots (LARGE FILES!)
+.vs/CopilotSnapshots/
+
+# IntelliSense database
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.VC.opendb
+*.opensdf
+*.sdf
+
+# Build Outputs (LARGE FILES!)
+
+# Build directories
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -22,23 +38,7 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# Visual Studio profiler
-*.psess
-*.vsp
-*.vspx
-*.sap
-
-# Visual Studio cache/options
-.vs/
-*.vsidx
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
-
-# Build results
+# Compiled files
 *.exe
 *.dll
 *.pdb
@@ -49,6 +49,12 @@ bld/
 *.iobj
 *.ipdb
 *.idb
+*.o
+*.a
+*.so
+*.dylib
+
+# Linker files
 *.pgc
 *.pgd
 *.rsp
@@ -64,37 +70,41 @@ bld/
 *.lastbuildstate
 *.unsuccessfulbuild
 
-# Visual Studio IntelliSense
-*.VC.db
-*.VC.db-shm
-*.VC.db-wal
-*.VC.opendb
+# Visual Studio Profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
 
-# Files built by Visual Studio
-*.opensdf
-*.sdf
+# Visual Studio Cache
+.vs/
+*.vsidx
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
 *.cachefile
-*.VC.VC.opendb
 
-# Visual Studio LightSwitch
-**/*.HTMLClient/GeneratedArtifacts
-**/*.DesktopClient/GeneratedArtifacts
-**/*.DesktopClient/ModelManifest.xml
-**/*.Server/GeneratedArtifacts
-**/*.Server/ModelManifest.xml
-_Pvt_Extensions
-
-# NCrunch
+# NCrunch (Testing Tool)
 _NCrunch_*
 .*crunch*.local.xml
 nCrunchTemp_*
 
-# Windows image file caches
+# Windows System Files
 Thumbs.db
 ehthumbs.db
-
-# Folder config file
 Desktop.ini
-
-# Recycle Bin
 $RECYCLE.BIN/
+
+# MacOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Project-Specific (if needed)
+# Add any game-specific files you don't want tracked
+# For example:
+# savegames/
+# *.save
