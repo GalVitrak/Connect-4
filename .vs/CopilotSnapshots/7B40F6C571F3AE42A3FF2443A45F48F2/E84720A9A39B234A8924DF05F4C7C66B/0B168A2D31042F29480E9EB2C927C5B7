@@ -1,6 +1,0 @@
-﻿// player vs player
-void game_init_pvp();
-
-// player vs computer
-void game_init_easy();
-void game_init_medium();

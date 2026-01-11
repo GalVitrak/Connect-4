@@ -1,4 +1,0 @@
-﻿#include "input.h"
-
-GameMove ai_easy_move();
-GameMove ai_medium_move();
