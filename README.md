@@ -2,7 +2,6 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/GalVitrak/Connect-4)
 [![Language](https://img.shields.io/badge/Language-C-green.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
-[![Grade](https://img.shields.io/badge/Grade-96%2F100-success)](README.md)
 
 A feature-rich implementation of the classic Connect-4 strategy game in C, with multiple AI difficulty levels and comprehensive statistics tracking.
 
@@ -17,9 +16,9 @@ A feature-rich implementation of the classic Connect-4 strategy game in C, with 
 
 ### User Interface
 - Colored ASCII board display with disc symbols
-  - Filled circle (●) for placed pieces
-  - Hollow circle (○) for empty slots
-- Red discs for Player 1, Yellow discs for Player 2/Computer
+  - Colored circles (O) for placed pieces
+  - Gray dot (.) for empty slots
+- Red circle for Player 1, Yellow circle for Player 2/Computer
 - AI move announcements ("AI placed a piece in Column X")
 - Centered text layout for professional appearance
 - Cross-platform support (Windows & Unix/Linux)
