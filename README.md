@@ -2,7 +2,6 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/GalVitrak/Connect-4)
 [![Language](https://img.shields.io/badge/Language-C-green.svg)](https://en.wikipedia.org/wiki/C_(programming_language))
-[![Grade](https://img.shields.io/badge/Grade-96%2F100-success)](README.md)
 
 A feature-rich implementation of the classic Connect-4 strategy game in C, with multiple AI difficulty levels and comprehensive statistics tracking.
 
