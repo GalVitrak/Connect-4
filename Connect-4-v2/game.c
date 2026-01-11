@@ -56,10 +56,10 @@ void game_init_pvp(void) {
 			winner = check_winner(move, player);
 			if(winner == 1){
 				if (player == cell_player1) {
-					print_centered("🎉 Player 1 (Red) wins! 🎉");
+					print_centered("Player 1 (Red) wins!");
 					player_1_win_pvp();
 				} else {
-					print_centered("🎉 Player 2 (Yellow) wins! 🎉");
+					print_centered("Player 2 (Yellow) wins!");
 					player_2_win_pvp();
 				}
 				running = press_enter_to_proceed();
@@ -327,9 +327,9 @@ void game_init_hard(void) {
  * 4. Total count = down + placed piece + up
  * 
  * Example: Piece placed at row 2 in a column with pieces at rows 1,2,3,4
- *   - Count down from row 2: finds pieces at rows 3,4 → adds 2
- *   - Count up from row 2: finds piece at row 1 → adds 1
- *   - Total: 2 (down) + 1 (placed) + 1 (up) = 4 → WIN!
+ *   - Count down from row 2: finds pieces at rows 3,4 -> adds 2
+ *   - Count up from row 2: finds piece at row 1 -> adds 1
+ *   - Total: 2 (down) + 1 (placed) + 1 (up) = 4 -> WIN!
  * 
  * Returns: 1 if win detected, 0 otherwise
  */
@@ -369,9 +369,9 @@ int check_vertical(GameMove last_move, Cell player) {
  * 4. Total count = right + placed piece + left
  * 
  * Example: Piece placed at column 2 with pieces at columns 0,1,2,3
- *   - Count right from col 2: finds piece at col 3 → adds 1
- *   - Count left from col 2: finds pieces at cols 1,0 → adds 2
- *   - Total: 1 (right) + 1 (placed) + 2 (left) = 4 → WIN!
+ *   - Count right from col 2: finds piece at col 3 -> adds 1
+ *   - Count left from col 2: finds pieces at cols 1,0 -> adds 2
+ *   - Total: 1 (right) + 1 (placed) + 2 (left) = 4 -> WIN!
  * 
  * Returns: 1 if win detected, 0 otherwise
  */
@@ -416,9 +416,9 @@ int check_horizontal(GameMove last_move, Cell player) {
  * 
  * Example (positive slope /):
  *   Piece at (3,2) with pieces at (2,3), (3,2), (4,1), (5,0)
- *   - Count up-right from (3,2): finds (2,3) → adds 1
- *   - Count down-left from (3,2): finds (4,1), (5,0) → adds 2
- *   - Total: 1 + 1 (placed) + 2 = 4 → WIN!
+ *   - Count up-right from (3,2): finds (2,3) -> adds 1
+ *   - Count down-left from (3,2): finds (4,1), (5,0) -> adds 2
+ *   - Total: 1 + 1 (placed) + 2 = 4 -> WIN!
  * 
  * Returns: 1 if win detected, 0 otherwise
  */
